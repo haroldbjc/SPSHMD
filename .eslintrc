@@ -1,0 +1,19 @@
+{
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "extends": "@react-native-community",
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".ts",
+          ".tsx",
+          ".js",
+          ".jsx",
+          ".json"
+        ]
+      }
+    }
+  }
+}
