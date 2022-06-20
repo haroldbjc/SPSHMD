@@ -11,7 +11,7 @@ import HomeScreen from '../screens/Home';
 export default createStackNavigator(
   {
     [urls.HOME_MAIN]: {
-      screen: HomeScreen,
+      screen: Placeholder,
       navigationOptions: () => ({
         title: 'SPSHMD',
         headerLeft: () => <LogoHeader />,

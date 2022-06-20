@@ -1,45 +1,120 @@
 import React, {useState, useCallback} from 'react';
-import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable} from 'react-native';
+import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, Platform} from 'react-native';
 import Button from '../components/Button';
 import colors from '../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
-import urls from '../constants/urls';
 import Checkbox from '../components/Checkbox';
-import {NavigationActions, StackActions} from 'react-navigation';
-
+import {uploadImage} from '../api';
+import ProgressHUD from '../components/ProgressHUD';
+import {Dialog, Paragraph, Portal} from 'react-native-paper';
+import {showMessage} from 'react-native-flash-message';
+import Geolocation from 'react-native-geolocation-service';
+import {PermissionsAndroid} from 'react-native';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
   const [response, setResponse] = useState(null);
   const [analyzerOptions, setAnalyzerOptions] = useState(settings);
+  const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState({uri: null, base64: null});
+  const [visible, setVisible] = useState(false);
+  const [geoLocation, setGeoLocation] = useState();
 
-  const handleAnalyze = () => {
-    // console.log('Analyzing...');
-    // navigation.reset(
-    //   [
-    //     NavigationActions.navigate({
-    //       routeName: urls.MAIN_ANALYSE,
-    //       params: {response},
-    //     }),
-    //   ],
-    //   0,
-    // );
-    navigation.dispatch(
-      StackActions.reset({
-        index: 1,
-        actions: [
-          NavigationActions.navigate({
-            routeName: urls.MAIN_HOME,
-          }),
-          NavigationActions.navigate({
-            routeName: urls.MAIN_ANALYSE,
-            params: {response},
-          }),
-        ],
-      }),
-    );
-    // navigation.navigate(urls.MAIN_ANALYSE, {response});
+  const handleHideDialog = (message) => {
+    console.log(message);
+    setVisible(false);
+    setImage(null);
+    if (message === 'OK') {
+      setResponse(null);
+    }
+  };
+
+  const createFormData = (photo) => {
+    const data = new FormData();
+    data.append('photo', {
+      name: photo.fileName,
+      type: photo.type,
+      uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+    });
+
+    return data;
+  };
+
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+        title: 'Location Permission',
+        message: 'This app needs access to your location ' + 'for location analysis.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      });
+      if (granted) {
+        console.log('You can use the location');
+      } else {
+        console.log('Location permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const handleAnalyze = async () => {
+    let result;
+    if (!isIgnoreLocation) {
+      if (!geoLocation) {
+        requestLocationPermission();
+      }
+      try {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            setGeoLocation(position);
+          },
+          (error) => {
+            console.log(error);
+            setGeoLocation(null);
+          },
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+        );
+      } catch (error) {
+        console.log(error);
+        setGeoLocation(null);
+      }
+    }
+    if (isRunningColorCorrection) {
+      try {
+        setLoading(true);
+        result = await uploadImage(createFormData(response.assets[0]));
+      } catch (error) {
+        showMessage({
+          message: 'Error',
+          description: error.message,
+          type: 'danger',
+        });
+      } finally {
+        setLoading(false);
+        if (result?.result) {
+          setImage({
+            uri: null,
+            base64: result.image,
+          });
+        } else {
+          showMessage({
+            message: 'Error',
+            description: 'Color correction failed.',
+            type: 'danger',
+          });
+          return;
+        }
+      }
+    } else {
+      setImage({
+        uri: response.assets[0].uri,
+        base64: null,
+      });
+    }
+    setVisible(true);
     return;
   };
 
@@ -65,6 +140,24 @@ const AnalyseScreen = ({navigation}) => {
     [analyzerOptions],
   );
 
+  const isRunningColorCorrection =
+    analyzerOptions.find((option) => option.value === 'runColorCorrection').checked === 'checked';
+
+  const isIgnoreLocation = analyzerOptions.find((option) => option.value === 'ignoreLocation').checked === 'checked';
+  const locationText = (location) => {
+    if (isIgnoreLocation) {
+      return '- Location ignored';
+    }
+    if (location?.coords) {
+      return `- Location: ${location.coords.latitude}, ${location.coords.longitude}`;
+    }
+    return '- Location not available';
+  };
+
+  if (loading) {
+    return <ProgressHUD isVisible title={'Running color correction... '} overlayColor={'white'} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -86,8 +179,7 @@ const AnalyseScreen = ({navigation}) => {
             ))}
           {!response?.assets && (
             <View style={styles.noImage}>
-              <Icon name="image-not-supported" size={100} color={colors.ACCENT} />
-              <Text style={styles.text}>Please take/select an image to analyse</Text>
+              <Icon name="image-not-supported" size={100} color={colors.LIGHT_GRAY} />
             </View>
           )}
         </View>
@@ -105,7 +197,6 @@ const AnalyseScreen = ({navigation}) => {
                   key={value}
                   status={analyzerOptions.find((items) => value === items.value).checked}
                   onPress={() => onCheckboxPress(value)}
-                  disabled={!response?.assets}
                 />
                 <Text style={styles.smallText}>{title}</Text>
               </View>
@@ -114,6 +205,40 @@ const AnalyseScreen = ({navigation}) => {
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
       </ScrollView>
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>
+          <Dialog.Title>Confirm Image</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Upload this image for metal detection?</Paragraph>
+            <Paragraph>- Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}</Paragraph>
+            <Paragraph>{locationText(geoLocation)}</Paragraph>
+          </Dialog.Content>
+          <View style={styles.imageContainer}>
+            {image && (
+              <View style={styles.image}>
+                <Image
+                  resizeMode="cover"
+                  resizeMethod="scale"
+                  source={image.uri ? {uri: image.uri} : {uri: `data:image/png;base64,${image.base64}`}}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{flex: 1, borderRadius: 10}}
+                />
+              </View>
+            )}
+            {!image && (
+              <View style={styles.noImage}>
+                <Icon name="image-not-supported" size={100} color={colors.LIGHT_GRAY} />
+              </View>
+            )}
+          </View>
+          <Dialog.Actions>
+            <View style={styles.buttonContainer}>
+              <Button onPress={() => handleHideDialog('Cancel')} title={'Cancel'} />
+              <Button onPress={() => handleHideDialog('OK')} title={'OK'} />
+            </View>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };
@@ -186,6 +311,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  dialog: {
+    backgroundColor: colors.GRAY,
+    borderRadius: 10,
+  },
 });
 
 const actions = [
@@ -215,9 +344,9 @@ const actions = [
 
 const settings = [
   {
-    title: 'Disable Analyzer',
-    value: 'disableAnalyzer',
-    checked: 'unchecked',
+    title: 'Run color correction',
+    value: 'runColorCorrection',
+    checked: 'checked',
   },
   {
     title: 'Ignore Location',

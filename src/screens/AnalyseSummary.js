@@ -7,53 +7,57 @@ import {ScrollView} from 'react-native-gesture-handler';
 import urls from '../constants/urls';
 import Button from '../components/Button';
 import colors from '../constants/colors';
-import {NavigationActions, StackActions} from 'react-navigation';
+import {NavigationActions, SafeAreaView, StackActions} from 'react-navigation';
 
 const AnalyseSummaryScreen = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const response = navigation.getParam('response');
-  console.log('response', response);
+  const image = navigation.getParam('image');
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   return (
-    <ScrollView>
-      <View style={[backgroundStyle, styles.sectionContainer]}>
-        <Icon name="home-repair-service" size={100} color={isDarkMode ? Colors.white : Colors.black} />
-        <View style={styles.imageContainer}>
-          {response?.assets &&
-            response?.assets.map(({uri}) => (
-              <View key={uri} style={styles.image}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View style={[backgroundStyle, styles.sectionContainer]}>
+          <View style={styles.imageContainer}>
+            {image && (
+              <View style={styles.image}>
                 <Image
                   resizeMode="cover"
                   resizeMethod="scale"
-                  source={{uri: uri}}
+                  source={{uri: `data:image/png;base64,${image}`}}
                   // eslint-disable-next-line react-native/no-inline-styles
                   style={{flex: 1, borderRadius: 10}}
                 />
               </View>
-            ))}
+            )}
+            {!image && (
+              <View style={styles.noImage}>
+                <Icon name="image-not-supported" size={100} color={colors.ACCENT} />
+              </View>
+            )}
+          </View>
+          {/* <DemoResponse>{response}</DemoResponse> */}
+          <Button
+            title="Back to Home"
+            onPress={() => {
+              navigation.dispatch(
+                StackActions.reset({
+                  index: 0,
+                  actions: [
+                    NavigationActions.navigate({
+                      routeName: urls.MAIN_HOME,
+                    }),
+                  ],
+                }),
+              );
+            }}
+          />
         </View>
-        <DemoResponse>{response}</DemoResponse>
-        <Button
-          title="Back to Home"
-          onPress={() => {
-            navigation.dispatch(
-              StackActions.reset({
-                index: 0,
-                actions: [
-                  NavigationActions.navigate({
-                    routeName: urls.MAIN_HOME,
-                  }),
-                ],
-              }),
-            );
-          }}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -76,6 +80,15 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
     borderRadius: 10,
+  },
+  noImage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 400,
+    borderRadius: 10,
+    margin: 10,
+    backgroundColor: colors.WHITE,
   },
   imageContainer: {
     height: 400,
