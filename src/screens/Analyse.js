@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, Platform} from 'react-native';
+import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, Platform, StatusBar} from 'react-native';
 import Button from '../components/Button';
 import colors from '../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -11,6 +11,7 @@ import {Dialog, Paragraph, Portal} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
@@ -140,6 +141,14 @@ const AnalyseScreen = ({navigation}) => {
     [analyzerOptions],
   );
 
+  const removeToken = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const isRunningColorCorrection =
     analyzerOptions.find((option) => option.value === 'runColorCorrection').checked === 'checked';
 
@@ -160,6 +169,7 @@ const AnalyseScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="white" />
       <ScrollView>
         <View style={styles.imageContainer}>
           {response?.assets &&
@@ -204,6 +214,7 @@ const AnalyseScreen = ({navigation}) => {
           })}
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
+        <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} />
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>
@@ -247,6 +258,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.WHITE,
+    paddingHorizontal: 10,
   },
   imageContainer: {
     height: 400,

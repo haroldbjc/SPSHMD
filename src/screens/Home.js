@@ -1,5 +1,5 @@
 import React from 'react';
-import {KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, useColorScheme, View} from 'react-native';
+import {KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, useColorScheme, View, StatusBar} from 'react-native';
 import {Formik} from 'formik';
 import ProgressHUD from '../components/ProgressHUD';
 import {showMessage} from 'react-native-flash-message';
@@ -47,6 +47,7 @@ const HomeScreen = () => {
     >
       {({handleChange, handleBlur, handleSubmit, values}) => (
         <SafeAreaView style={styles.container}>
+          <StatusBar backgroundColor="white" />
           <KeyboardAvoidingView style={styles.container}>
             <ScrollView>
               <TextInput

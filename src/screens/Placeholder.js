@@ -1,23 +1,22 @@
 import React from 'react';
-import {StyleSheet, Text, useColorScheme, View} from 'react-native';
+import {StyleSheet, Text, StatusBar, View, SafeAreaView} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Placeholder = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: "#fff",
   };
 
   return (
-    <View style={[backgroundStyle, styles.sectionContainer]}>
-      <Icon name="home-repair-service" size={100} color={isDarkMode ? Colors.white : Colors.black} />
-      <Text style={[styles.sectionTitle, {color: isDarkMode ? Colors.white : Colors.black}]}>Maintainance</Text>
-      <Text style={[styles.sectionDescription, {color: isDarkMode ? Colors.light : Colors.dark}]}>
-        Page will be up soon
-      </Text>
-    </View>
+    <SafeAreaView>
+      <StatusBar backgroundColor="white" />
+      <View style={[backgroundStyle, styles.sectionContainer]}>
+        <Icon name="home-repair-service" size={100} color={Colors.black} />
+        <Text style={[styles.sectionTitle, {color: Colors.black}]}>Maintainance</Text>
+        <Text style={[styles.sectionDescription, {color: Colors.dark}]}>Page will be up soon</Text>
+      </View>
+    </SafeAreaView>
   );
 };
 

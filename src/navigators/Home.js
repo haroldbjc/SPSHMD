@@ -13,8 +13,9 @@ export default createStackNavigator(
     [urls.HOME_MAIN]: {
       screen: Placeholder,
       navigationOptions: () => ({
-        title: 'SPSHMD',
-        headerLeft: () => <LogoHeader />,
+        headerShown: false,
+        // title: 'SPSHMD',
+        // headerLeft: () => <LogoHeader />,
       }),
     },
     [urls.HOME_CAMERA]: {

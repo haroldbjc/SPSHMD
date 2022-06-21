@@ -4,20 +4,19 @@ import {standardHeaderTitleStyle, standardHeaderStyle, standardCardStyle} from '
 import urls from '../constants/urls';
 import Placeholder from '../screens/Placeholder';
 import LogoHeader from '../components/LogoHeader';
+import LoginScreen from '../screens/Login';
 
 export default createStackNavigator(
   {
-    [urls.PROFILE_MAIN]: {
-      screen: Placeholder,
+    [urls.AUTH_LOGIN]: {
+      screen: LoginScreen,
       navigationOptions: () => ({
-        headerShown: false,
         title: 'SPSHMD',
-        headerLeft: () => <LogoHeader />,
       }),
     },
   },
   {
-    initialRouteName: urls.PROFILE_MAIN,
+    initialRouteName: urls.AUTH_LOGIN,
     defaultNavigationOptions: () => ({
       headerStyle: standardHeaderStyle,
       headerTitleStyle: standardHeaderTitleStyle,
