@@ -5,12 +5,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Placeholder = () => {
   const backgroundStyle = {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   };
 
   return (
     <SafeAreaView>
-      <StatusBar backgroundColor="white" />
+      <StatusBar hidden />
       <View style={[backgroundStyle, styles.sectionContainer]}>
         <Icon name="home-repair-service" size={100} color={Colors.black} />
         <Text style={[styles.sectionTitle, {color: Colors.black}]}>Maintainance</Text>

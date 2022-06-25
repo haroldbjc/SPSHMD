@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Image, useColorScheme, View, ScrollView, StatusBar} from 'react-native';
-import {TextInput as PaperTextInput} from 'react-native-paper';
+import TextInput from '../components/TextInput';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {validationSchema} from '../utils/validationSchema';
@@ -13,6 +13,7 @@ import {showMessage} from 'react-native-flash-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProgressHUD from '../components/ProgressHUD';
 import theme from '../configs/theme';
+import {Text} from 'react-native-paper';
 
 const LoginScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -105,11 +106,12 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={[backgroundStyle, styles.container]}>
-      <StatusBar backgroundColor="white" />
-      <ScrollView>
+      <StatusBar hidden />
+      <ScrollView contentContainerStyle={styles.contentContainerStyle}>
         <View style={styles.imageContainer}>
           <Image resizeMode="contain" source={require('../assets/images/outline_radar_black_36dp.png')} />
         </View>
+        <Text style={styles.title}>Smart Portable System for Heavy Metal Detection</Text>
         <Formik
           //validationSchema={validationSchema}
           initialValues={{initialValues}}
@@ -119,36 +121,21 @@ const LoginScreen = ({navigation}) => {
         >
           {({handleChange, handleBlur, handleSubmit, values}) => (
             <View>
-              <PaperTextInput
-                activeOutlineColor={theme.colors.primary}
-                outlineColor="transparent"
-                theme={theme}
-                mode="outlined"
-                style={styles.textInput}
+              <TextInput
                 label="Username"
                 value={values.username}
                 onChangeText={handleChange('username')}
                 onBlur={handleBlur('username')}
                 autoCorrect={false}
               />
-              <PaperTextInput
-                outlineColor="transparent"
-                theme={theme}
-                activeOutlineColor={theme.colors.primary}
-                mode="outlined"
-                style={styles.textInput}
+              {/* <TextInput
                 label="Email"
                 value={values.email}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 autoCorrect={false}
-              />
-              <PaperTextInput
-                outlineColor="transparent"
-                theme={theme}
-                activeOutlineColor={theme.colors.primary}
-                mode="outlined"
-                style={styles.textInput}
+              /> */}
+              <TextInput
                 label="Password"
                 value={values.password}
                 onChangeText={handleChange('password')}
@@ -171,17 +158,15 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
+  contentContainerStyle: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'center',
+  },
   imageContainer: {
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 20,
     padding: 20,
-    flex: 1,
-  },
-  textInput: {
-    marginBottom: 20,
-    backgroundColor: theme.colors.lightGray,
-    color: theme.colors.primary,
   },
   sectionContainer: {
     height: '100%',
@@ -194,6 +179,13 @@ const styles = StyleSheet.create({
   },
   sectionDescription: {
     marginTop: 8,
+  },
+  title: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });
 

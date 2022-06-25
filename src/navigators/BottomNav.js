@@ -33,7 +33,7 @@ export default createMaterialBottomTabNavigator(
     },
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Analyse',
     activeColor: theme.colors.primary,
     inactiveColor: theme.colors.inactive,
     barStyle: {backgroundColor: '#fff'},

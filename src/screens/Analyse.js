@@ -169,7 +169,7 @@ const AnalyseScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="white" />
+      <StatusBar hidden />
       <ScrollView>
         <View style={styles.imageContainer}>
           {response?.assets &&
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.WHITE,
-    paddingHorizontal: 10,
+    padding: 10,
   },
   imageContainer: {
     height: 400,

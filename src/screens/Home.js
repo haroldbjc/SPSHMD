@@ -47,7 +47,7 @@ const HomeScreen = () => {
     >
       {({handleChange, handleBlur, handleSubmit, values}) => (
         <SafeAreaView style={styles.container}>
-          <StatusBar backgroundColor="white" />
+          <StatusBar hidden />
           <KeyboardAvoidingView style={styles.container}>
             <ScrollView>
               <TextInput
