@@ -143,7 +143,8 @@ const LoginScreen = ({navigation}) => {
                 autoCorrect={false}
                 secureTextEntry={true}
               />
-              <Button title={'Login'} onPress={handleSubmit} loading={isLoading} />
+              <Button title={'Login'} onPress={handleSubmit} loading={isLoading} icon="login" />
+              <Button title={'Register'} loading={isLoading} icon="account-plus" />
             </View>
           )}
         </Formik>

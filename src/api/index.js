@@ -19,3 +19,12 @@ export const uploadImage = async (image) => {
   });
   return response.data;
 };
+
+export const metalDetection = async (image) => {
+  const response = await axiosInstance.post('/image/metalDetection', image, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};

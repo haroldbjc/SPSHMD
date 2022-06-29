@@ -5,13 +5,14 @@ import colors from '../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import Checkbox from '../components/Checkbox';
-import {uploadImage} from '../api';
+import {uploadImage, metalDetection} from '../api';
 import ProgressHUD from '../components/ProgressHUD';
-import {Dialog, Paragraph, Portal} from 'react-native-paper';
+import {Dialog, Paragraph, Portal, Chip} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFS from 'react-native-fs';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
@@ -21,12 +22,13 @@ const AnalyseScreen = ({navigation}) => {
   const [image, setImage] = useState({uri: null, base64: null});
   const [visible, setVisible] = useState(false);
   const [geoLocation, setGeoLocation] = useState();
+  const [detectedMetal, setDetectedMetal] = useState(false);
+  const [loadingDialog, setLoadingDialog] = useState(false);
 
   const handleHideDialog = (message) => {
-    console.log(message);
     setVisible(false);
-    setImage(null);
-    if (message === 'OK') {
+    setImage(false);
+    if (message === 'Submit Data') {
       setResponse(null);
     }
   };
@@ -35,7 +37,7 @@ const AnalyseScreen = ({navigation}) => {
     const data = new FormData();
     data.append('photo', {
       name: photo.fileName,
-      type: photo.type,
+      type: photo.type || 'image/jpg',
       uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
     });
 
@@ -62,6 +64,10 @@ const AnalyseScreen = ({navigation}) => {
   };
 
   const handleAnalyze = async () => {
+    setLoadingDialog('Analyzing...');
+    setLoading(true);
+    let coluorCorrected = false;
+
     let result;
     if (!isIgnoreLocation) {
       if (!geoLocation) {
@@ -85,7 +91,7 @@ const AnalyseScreen = ({navigation}) => {
     }
     if (isRunningColorCorrection) {
       try {
-        setLoading(true);
+        setLoadingDialog('Running color correction...');
         result = await uploadImage(createFormData(response.assets[0]));
       } catch (error) {
         showMessage({
@@ -94,12 +100,8 @@ const AnalyseScreen = ({navigation}) => {
           type: 'danger',
         });
       } finally {
-        setLoading(false);
         if (result?.result) {
-          setImage({
-            uri: null,
-            base64: result.image,
-          });
+          coluorCorrected = result;
         } else {
           showMessage({
             message: 'Error',
@@ -109,14 +111,55 @@ const AnalyseScreen = ({navigation}) => {
           return;
         }
       }
-    } else {
-      setImage({
-        uri: response.assets[0].uri,
-        base64: null,
-      });
     }
+    await handleDetection(coluorCorrected);
+    setLoading(false);
     setVisible(true);
     return;
+  };
+
+  const handleDetection = async (coluorCorrected) => {
+    //setLoading(true);
+    let result;
+    let file = response.assets[0].uri;
+    setLoadingDialog('Detecting metal...');
+
+    // convert base64 to file then return uri if image.base64 is not null
+    if (coluorCorrected?.image) {
+      try {
+        // set RNFS temp path for image
+        file = RNFS.TemporaryDirectoryPath + '/' + coluorCorrected.fileName;
+        await RNFS.writeFile(file, coluorCorrected.image, 'base64');
+      } catch (error) {
+        console.log(error);
+      } finally {
+        // add prefix to file uri
+        file = 'file://' + file;
+      }
+    }
+
+    let tempImage = {
+      uri: file,
+      base64: coluorCorrected?.image,
+      fileName: response.assets[0].fileName,
+      type: response.assets[0].type,
+    };
+
+    try {
+      result = await metalDetection(createFormData(tempImage));
+    } catch (error) {
+      showMessage({
+        message: 'Error',
+        description: error.message,
+        type: 'danger',
+      });
+    } finally {
+      // setLoading(false);
+      console.log(result);
+      setDetectedMetal(result?.result);
+      setImage(tempImage);
+      // setResponse(null);
+    }
   };
 
   const onButtonPress = useCallback((type, options) => {
@@ -155,16 +198,16 @@ const AnalyseScreen = ({navigation}) => {
   const isIgnoreLocation = analyzerOptions.find((option) => option.value === 'ignoreLocation').checked === 'checked';
   const locationText = (location) => {
     if (isIgnoreLocation) {
-      return '- Location ignored';
+      return 'Location ignored';
     }
     if (location?.coords) {
-      return `- Location: ${location.coords.latitude}, ${location.coords.longitude}`;
+      return `Location: ${location.coords.latitude}, ${location.coords.longitude}`;
     }
-    return '- Location not available';
+    return 'Location not available';
   };
 
   if (loading) {
-    return <ProgressHUD isVisible title={'Running color correction... '} overlayColor={'white'} />;
+    return <ProgressHUD isVisible title={loadingDialog} overlayColor={'white'} />;
   }
 
   return (
@@ -214,16 +257,10 @@ const AnalyseScreen = ({navigation}) => {
           })}
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
-        <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} />
+        {/* <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} /> */}
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>
-          <Dialog.Title>Confirm Image</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>Upload this image for metal detection?</Paragraph>
-            <Paragraph>- Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}</Paragraph>
-            <Paragraph>{locationText(geoLocation)}</Paragraph>
-          </Dialog.Content>
           <View style={styles.imageContainer}>
             {image && (
               <View style={styles.image}>
@@ -242,10 +279,28 @@ const AnalyseScreen = ({navigation}) => {
               </View>
             )}
           </View>
+          <Dialog.Content>
+            <Chip
+              icon={isRunningColorCorrection ? 'checkbox-marked-circle-outline' : 'close-circle-outline'}
+              style={styles.chip}
+            >
+              Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}
+            </Chip>
+            <Chip icon={isIgnoreLocation ? 'map-marker-off' : 'map-marker'} style={styles.chip}>
+              {locationText(geoLocation)}
+            </Chip>
+            <Chip icon={'radar'} style={styles.chip}>
+              Result: {detectedMetal}
+            </Chip>
+            {/* <Paragraph>Upload this image for metal detection?</Paragraph>
+            <Paragraph>- Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}</Paragraph>
+            <Paragraph>{locationText(geoLocation)}</Paragraph>
+            <Text style={styles.dialogText}>Result: {detectedMetal}</Text> */}
+          </Dialog.Content>
           <Dialog.Actions>
             <View style={styles.buttonContainer}>
               <Button onPress={() => handleHideDialog('Cancel')} title={'Cancel'} />
-              <Button onPress={() => handleHideDialog('OK')} title={'OK'} />
+              <Button onPress={() => handleHideDialog('Submit Data')} title={'Submit Data'} />
             </View>
           </Dialog.Actions>
         </Dialog>
@@ -326,6 +381,15 @@ const styles = StyleSheet.create({
   dialog: {
     backgroundColor: colors.GRAY,
     borderRadius: 10,
+  },
+  chip: {
+    margin: 1,
+    backgroundColor: colors.ACCENT,
+  },
+  dialogTitle: {
+    fontSize: 20,
+    marginTop: 1,
+    marginBottom: 5,
   },
 });
 
