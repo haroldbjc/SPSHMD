@@ -257,7 +257,7 @@ const AnalyseScreen = ({navigation}) => {
           })}
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
-        {/* <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} /> */}
+        <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} />
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>

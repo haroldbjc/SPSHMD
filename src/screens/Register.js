@@ -1,14 +1,14 @@
 import React from 'react';
 import {StyleSheet, Image, useColorScheme, View, ScrollView, StatusBar} from 'react-native';
+import {validationSchema} from '../utils/validationSchema';
 import TextInput from '../components/TextInput';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Formik} from 'formik';
-import {SafeAreaView, StackActions} from 'react-navigation';
+import {SafeAreaView} from 'react-navigation';
 import Button from '../components/Button';
-import {signIn} from '../api/user';
+import {signUp} from '../api/user';
 import {NavigationActions} from 'react-navigation';
 import {showMessage} from 'react-native-flash-message';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Text} from 'react-native-paper';
 
 const LoginScreen = ({navigation}) => {
@@ -27,78 +27,87 @@ const LoginScreen = ({navigation}) => {
     confirmPassword: '',
   };
 
-  const handleSubmission = async (values) => {
-    let response;
+  const handleSignUp = async (values) => {
+    let response = null;
     try {
       setIsLoading(true);
-      response = await signIn(values);
+      response = await signUp(values);
     } catch (error) {
-      console.log(response);
       showMessage({
         message: 'Error',
-        description: error.response.data?.error,
+        description: error.response.data?.message,
         type: 'danger',
       });
     } finally {
       setIsLoading(false);
     }
     if (response) {
-      console.log(await AsyncStorage.getItem('token'));
-      navigation.dispatch(
-        StackActions.reset({
-          index: 0,
-          actions: [NavigationActions.navigate({routeName: 'MainHome'})],
-        }),
+      showMessage({
+        message: 'Success',
+        description: 'You have successfully registered.',
+        type: 'success',
+      });
+      navigation.reset(
+        [
+          NavigationActions.navigate({
+            routeName: 'AuthLogin',
+          }),
+        ],
+        0,
       );
+    } else {
+      console.log('Error');
     }
-  };
-
-  // route to register screen
-  const handleRegister = () => {
-    navigation.push('AuthRegister');
   };
 
   return (
     <SafeAreaView style={[backgroundStyle, styles.container]}>
-      <StatusBar hidden />
       <ScrollView contentContainerStyle={styles.contentContainerStyle}>
         <View style={styles.imageContainer}>
           <Image resizeMode="contain" source={require('../assets/images/outline_radar_black_36dp.png')} />
         </View>
         <Text style={styles.title}>Smart Portable System for Heavy Metal Detection</Text>
+        {/* Formik with validation */}
         <Formik
-          //validationSchema={validationSchema}
-          initialValues={{initialValues}}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
           onSubmit={(values) => {
-            handleSubmission(values);
+            handleSignUp(values);
           }}
         >
-          {({handleChange, handleBlur, handleSubmit, values}) => (
+          {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
             <View>
               <TextInput
-                label="Username"
-                value={values.username}
+                label={errors.username && touched.username ? errors.username : 'Username'}
                 onChangeText={handleChange('username')}
                 onBlur={handleBlur('username')}
-                autoCorrect={false}
+                value={values.username}
+                error={touched.username && errors.username}
               />
-              {/* <TextInput
-                label="Email"
-                value={values.email}
+              <TextInput
+                label={errors.email && touched.email ? errors.email : 'Email'}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
-                autoCorrect={false}
-              /> */}
+                value={values.email}
+                error={touched.email && errors.email}
+              />
               <TextInput
-                label="Password"
-                value={values.password}
+                label={errors.password && touched.password ? errors.password : 'Password'}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
-                autoCorrect={false}
-                secureTextEntry={true}
+                value={values.password}
+                error={touched.password && errors.password}
+                secureTextEntry
               />
-              <Button title={'Login'} onPress={handleSubmit} loading={isLoading} icon="login" />
-              <Button title={'Register'} onPress={handleRegister} loading={isLoading} icon="account-plus" />
+              <TextInput
+                label={errors.confirmPassword && touched.confirmPassword ? errors.confirmPassword : 'Confirm Password'}
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
+                value={values.confirmPassword}
+                error={touched.confirmPassword && errors.confirmPassword}
+                secureTextEntry
+              />
+              <Button title="Register" onPress={handleSubmit} loading={isLoading} icon="account-plus" />
             </View>
           )}
         </Formik>

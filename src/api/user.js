@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const signUp = async (user) => {
   const response = await axiosInstance.post('/api/auth/signup', user);
-  return response?.data;
+  return response;
 };
 
 export const signIn = async (user) => {

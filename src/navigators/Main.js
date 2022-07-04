@@ -6,6 +6,7 @@ import {standardCardStyle, standardHeaderStyle, standardHeaderTitleStyle} from '
 
 import BottomNavigator from './BottomNav';
 import AnalyseNavigator from './Analyse';
+import AuthNavigator from './Auth';
 import LoginScreen from '../screens/Login';
 
 export default createStackNavigator(
@@ -22,15 +23,15 @@ export default createStackNavigator(
         headerShown: false,
       }),
     },
-    [urls.AUTH_LOGIN]: {
-      screen: LoginScreen,
+    [urls.AUTH_MAIN]: {
+      screen: AuthNavigator,
       navigationOptions: () => ({
         headerShown: false,
       }),
     },
   },
   {
-    initialRouteName: urls.AUTH_LOGIN,
+    initialRouteName: urls.AUTH_MAIN,
     defaultNavigationOptions: () => ({
       cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       headerStyle: standardHeaderStyle,
