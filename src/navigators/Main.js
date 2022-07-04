@@ -7,7 +7,6 @@ import {standardCardStyle, standardHeaderStyle, standardHeaderTitleStyle} from '
 import BottomNavigator from './BottomNav';
 import AnalyseNavigator from './Analyse';
 import AuthNavigator from './Auth';
-import LoginScreen from '../screens/Login';
 
 export default createStackNavigator(
   {

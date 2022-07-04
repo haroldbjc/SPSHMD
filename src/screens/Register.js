@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Image, useColorScheme, View, ScrollView, StatusBar} from 'react-native';
+import {StyleSheet, Image, useColorScheme, View, ScrollView} from 'react-native';
 import {validationSchema} from '../utils/validationSchema';
 import TextInput from '../components/TextInput';
 import {Colors} from 'react-native/Libraries/NewAppScreen';

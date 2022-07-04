@@ -7,7 +7,7 @@ import * as ImagePicker from 'react-native-image-picker';
 import Checkbox from '../components/Checkbox';
 import {uploadImage, metalDetection} from '../api';
 import ProgressHUD from '../components/ProgressHUD';
-import {Dialog, Paragraph, Portal, Chip} from 'react-native-paper';
+import {Dialog, Portal, Chip} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
