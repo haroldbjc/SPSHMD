@@ -3,9 +3,9 @@ import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import theme from '../configs/theme';
+import AnalyseScreen from '../screens/Analyse';
 
 import HomeNavigator from './Home';
-import AnalyseScreen from '../screens/Analyse';
 import ProfileNavigator from './Profile';
 
 export default createMaterialBottomTabNavigator(

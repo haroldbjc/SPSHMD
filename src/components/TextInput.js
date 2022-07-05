@@ -1,9 +1,10 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {TextInput as PaperTextInput} from 'react-native-paper';
+
 import theme from '../configs/theme';
 
-const TextInput = ({title, mode = 'outlined', outlineColor = 'transparent', ...props}) => {
+const TextInput = ({mode = 'outlined', outlineColor = 'transparent', ...props}) => {
   return (
     <PaperTextInput
       mode={mode}
@@ -15,9 +16,7 @@ const TextInput = ({title, mode = 'outlined', outlineColor = 'transparent', ...p
       activeOutlineColor={theme.colors.primary}
       outlineColor="transparent"
       {...props}
-    >
-      {title}
-    </PaperTextInput>
+    />
   );
 };
 
@@ -25,6 +24,7 @@ const styles = StyleSheet.create({
   textInput: {
     marginBottom: 20,
     color: theme.colors.primary,
+    fontFamily: 'NotoSans-Regular',
   },
   viewStyle: {
     minWidth: '45%',
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
   },
   labelStyle: {
     color: theme.colors.primary,
+    fontFamily: 'NotoSans-Regular',
   },
 });
 export default TextInput;

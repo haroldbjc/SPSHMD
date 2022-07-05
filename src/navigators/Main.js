@@ -1,7 +1,6 @@
 import {createStackNavigator, CardStyleInterpolators} from 'react-navigation-stack';
 
 import urls from '../constants/urls';
-
 import {standardCardStyle, standardHeaderStyle, standardHeaderTitleStyle} from '../configs/styles';
 
 import BottomNavigator from './BottomNav';

@@ -4,11 +4,12 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Formik} from 'formik';
+import {showMessage} from 'react-native-flash-message';
+
 import {EditUserValidationSchema} from '../utils/validationSchema';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import {editUser} from '../api/user';
-import {showMessage} from 'react-native-flash-message';
 
 const ProfileScreen = () => {
   const [user, setUser] = React.useState(null);

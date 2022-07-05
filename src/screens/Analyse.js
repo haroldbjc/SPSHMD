@@ -1,18 +1,19 @@
 import React, {useState, useCallback} from 'react';
 import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, Platform, StatusBar} from 'react-native';
-import Button from '../components/Button';
-import colors from '../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
-import Checkbox from '../components/Checkbox';
-import {uploadImage, metalDetection, postResults} from '../api';
-import ProgressHUD from '../components/ProgressHUD';
 import {Dialog, Portal, Chip} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
+
+import ProgressHUD from '../components/ProgressHUD';
+import {uploadImage, metalDetection, postResults} from '../api';
+import Checkbox from '../components/Checkbox';
+import colors from '../constants/colors';
+import Button from '../components/Button';
 import {getRandomLocation} from '../utils/getRandomLocations';
 import {MetalWeight} from '../utils/metalWeight';
 const includeExtra = true;

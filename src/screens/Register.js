@@ -1,15 +1,16 @@
 import React from 'react';
 import {StyleSheet, Image, useColorScheme, View, ScrollView} from 'react-native';
-import {validationSchema} from '../utils/validationSchema';
-import TextInput from '../components/TextInput';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Formik} from 'formik';
 import {SafeAreaView} from 'react-navigation';
-import Button from '../components/Button';
-import {signUp} from '../api/user';
 import {NavigationActions} from 'react-navigation';
 import {showMessage} from 'react-native-flash-message';
 import {Text} from 'react-native-paper';
+
+import {signUp} from '../api/user';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
+import {validationSchema} from '../utils/validationSchema';
 
 const LoginScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);

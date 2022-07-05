@@ -6,6 +6,7 @@
     "android": "react-native run-android --no-jetifier",
     "ios": "react-native run-ios",
     "start": "react-native start",
+    "link": "react-native link",
     "test": "jest",
     "lint": "eslint .",
     "bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/"
@@ -19,6 +20,7 @@
     "@types/react-native": "^0.67.3",
     "axios": "^0.27.2",
     "buffer": "^6.0.3",
+    "eslint-plugin-import-helpers": "^1.2.1",
     "formik": "^2.2.9",
     "react": "^18.2.0",
     "react-native": "0.68.0",
@@ -31,7 +33,7 @@
     "react-native-maps": "^0.31.1",
     "react-native-paper": "^4.12.0",
     "react-native-safe-area-context": "^4.2.4",
-    "react-native-screens": "^3.13.1",
+    "react-native-screens": "^3.14.1",
     "react-native-vector-icons": "^9.1.0",
     "react-navigation": "^4.4.4",
     "react-navigation-material-bottom-tabs": "^2.3.5",
@@ -46,8 +48,7 @@
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.67.0",
     "prettier": "^2.6.2",
-    "react-test-renderer": "17.0.2",
-    "typescript": "^4.6.3"
+    "react-test-renderer": "17.0.2"
   },
   "jest": {
     "preset": "react-native"

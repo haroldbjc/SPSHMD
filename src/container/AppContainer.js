@@ -10,6 +10,7 @@ const AppNavigationContainer = createAppContainer(AppNavigator);
 const AppContainer = () => {
   const navigationRef = useRef(null);
   return (
+    // eslint-disable-next-line react-native/no-inline-styles
     <View style={{flex: 1}}>
       <AppNavigationContainer ref={navigationRef} />
       <FlashMessage style={styles.message} />

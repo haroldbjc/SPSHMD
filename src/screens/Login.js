@@ -1,23 +1,17 @@
 import React from 'react';
-import {StyleSheet, Image, useColorScheme, View, ScrollView, StatusBar} from 'react-native';
-import TextInput from '../components/TextInput';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {StyleSheet, Image, View, ScrollView, StatusBar} from 'react-native';
 import {Formik} from 'formik';
 import {SafeAreaView, StackActions} from 'react-navigation';
-import Button from '../components/Button';
-import {signIn} from '../api/user';
 import {NavigationActions} from 'react-navigation';
 import {showMessage} from 'react-native-flash-message';
-import {Text} from 'react-native-paper';
+
+import Button from '../components/Button';
+import {signIn} from '../api/user';
+import TextInput from '../components/TextInput';
+import Text from '../components/Text';
 
 const LoginScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);
-
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
 
   const initialValues = {
     username: '',
@@ -57,7 +51,7 @@ const LoginScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={[backgroundStyle, styles.container]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar hidden />
       <ScrollView contentContainerStyle={styles.contentContainerStyle}>
         <View style={styles.imageContainer}>
@@ -80,13 +74,6 @@ const LoginScreen = ({navigation}) => {
                 onBlur={handleBlur('username')}
                 autoCorrect={false}
               />
-              {/* <TextInput
-                label="Email"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
-                autoCorrect={false}
-              /> */}
               <TextInput
                 label="Password"
                 value={values.password}
@@ -96,7 +83,7 @@ const LoginScreen = ({navigation}) => {
                 secureTextEntry={true}
               />
               <Button title={'Login'} onPress={handleSubmit} loading={isLoading} icon="login" />
-              <Button title={'Register'} onPress={handleRegister} loading={isLoading} icon="account-plus" />
+              <Button title={'Register'} onPress={handleRegister} icon="account-plus" />
             </View>
           )}
         </Formik>
@@ -136,7 +123,6 @@ const styles = StyleSheet.create({
   title: {
     color: 'black',
     fontSize: 20,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
   },

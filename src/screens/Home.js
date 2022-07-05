@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from 'react-native-maps';
+
 import {MetalWeight} from '../utils/metalWeight';
 import Button from '../components/Button';
 import {getLocations} from '../api';

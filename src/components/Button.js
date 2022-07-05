@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Button as PaperButton} from 'react-native-paper';
+
 import {buttonTheme} from '../configs/theme';
 import colors from '../constants/colors';
 
@@ -37,6 +38,7 @@ const styles = StyleSheet.create({
   },
   labelStyle: {
     color: colors.ACCENT,
+    fontFamily: 'NotoSans-Regular',
   },
 });
 

@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ProgressHUD from '../components/ProgressHUD';
 import {NavigationActions} from 'react-navigation';
+
+import ProgressHUD from '../components/ProgressHUD';
 
 const Auth = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);
