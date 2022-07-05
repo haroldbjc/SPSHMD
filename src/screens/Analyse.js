@@ -1,11 +1,10 @@
-import React, {useState, useCallback} from 'react';
-import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, Platform, StatusBar} from 'react-native';
+import React, {useState, useCallback, useEffect} from 'react';
+import {Text, StyleSheet, SafeAreaView, View, Image, ScrollView, Pressable, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
-import {Dialog, Portal, Chip} from 'react-native-paper';
+import {Dialog, Portal} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
 import Geolocation from 'react-native-geolocation-service';
-import {PermissionsAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
@@ -14,8 +13,9 @@ import {uploadImage, metalDetection, postResults} from '../api';
 import Checkbox from '../components/Checkbox';
 import colors from '../constants/colors';
 import Button from '../components/Button';
-import {getRandomLocation} from '../utils/getRandomLocations';
-import {MetalWeight} from '../utils/metalWeight';
+import {requestLocationPermission} from '../utils/locationAccess';
+import createFormData from '../utils/createFormData';
+import Chip from '../components/Chip';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
@@ -27,72 +27,40 @@ const AnalyseScreen = ({navigation}) => {
   const [geoLocation, setGeoLocation] = useState();
   const [detectedMetal, setDetectedMetal] = useState(false);
   const [loadingDialog, setLoadingDialog] = useState(false);
-  const [region, setRegion] = React.useState({
-    latitude: 5.3553808,
-    longitude: 100.2912276,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  });
 
-  const handleHideDialog = async (message) => {
-    setVisible(false);
-    setImage(false);
-    if (message === 'Submit Data') {
-      setLoadingDialog(true);
-      const userdata = await AsyncStorage.getItem('user').then((user) => {
-        return JSON.parse(user);
-      });
-      const data = {
-        userid: userdata.id,
-        username: userdata.username,
-        detectedMetal: detectedMetal,
-        geoLocation: geoLocation,
-      };
+  // useEffect services
+  useEffect(() => {
+    // get current location
+    if (!geoLocation) {
+      requestLocationPermission();
       try {
-        const response2 = await postResults(data);
-        if (response2) {
-          showMessage({
-            message: 'Success',
-            description: 'You have successfully submitted your data.',
-            type: 'success',
-          });
-        } else {
-          console.log('Error');
-        }
+        Geolocation.getCurrentPosition(
+          (position) => {
+            setGeoLocation(position);
+          },
+          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        );
       } catch (error) {
-        showMessage({
-          message: 'Error',
-          description: 'Something went wrong.',
-          type: 'danger',
-        });
-      } finally {
-        if (response) {
-          setLoadingDialog(false);
-          setResponse(null);
-        }
+        console.log(error);
+        setGeoLocation(null);
       }
     }
-  };
+  }, [geoLocation]);
 
-  // send random locations to server
-  const handleRandomPress = async () => {
-    let randomLocations = getRandomLocation(region, 0.1);
+  // submit result to server
+  const handleSubmitData = async () => {
     const userdata = await AsyncStorage.getItem('user').then((user) => {
       return JSON.parse(user);
     });
     const data = {
       userid: userdata.id,
       username: userdata.username,
-      detectedMetal: MetalWeight[Math.floor(Math.random() * MetalWeight.length)],
-      geoLocation: {
-        ...geoLocation,
-        coords: {...geoLocation.coords, latitude: randomLocations.latitude, longitude: randomLocations.longitude},
-      },
+      detectedMetal: detectedMetal,
+      geoLocation: geoLocation,
     };
-    console.log(data.detectedMetal);
     try {
-      const response2 = await postResults(data);
-      if (response2) {
+      const result = await postResults(data);
+      if (result) {
         showMessage({
           message: 'Success',
           description: 'You have successfully submitted your data.',
@@ -101,87 +69,30 @@ const AnalyseScreen = ({navigation}) => {
       } else {
         console.log('Error');
       }
+      setResponse(null);
+      setImage(false);
+      setVisible(false);
+      setLoading(false);
     } catch (error) {
       showMessage({
         message: 'Error',
         description: 'Something went wrong.',
         type: 'danger',
       });
-    } finally {
-      if (response) {
-        setLoadingDialog(false);
-        setResponse(null);
-      }
     }
   };
 
-  const createFormData = (photo) => {
-    const data = new FormData();
-    data.append('photo', {
-      name: photo.fileName,
-      type: photo.type || 'image/jpg',
-      uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-    });
-
-    return data;
-  };
-
-  const requestLocationPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
-        title: 'Location Permission',
-        message: 'This app needs access to your location ' + 'for location analysis.',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      });
-      if (granted) {
-        console.log('You can use the location');
-      } else {
-        console.log('Location permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-
+  // handle analyse button
   const handleAnalyze = async () => {
     setLoadingDialog('Analyzing...');
     setLoading(true);
+    setImage(false);
     let coluorCorrected = false;
 
-    let result;
-    if (!isIgnoreLocation) {
-      if (!geoLocation) {
-        requestLocationPermission();
-      }
-      try {
-        Geolocation.getCurrentPosition(
-          (position) => {
-            setGeoLocation(position);
-          },
-          (error) => {
-            console.log(error);
-            setGeoLocation(null);
-          },
-          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-        );
-      } catch (error) {
-        console.log(error);
-        setGeoLocation(null);
-      }
-    }
     if (isRunningColorCorrection) {
       try {
         setLoadingDialog('Running color correction...');
-        result = await uploadImage(createFormData(response.assets[0]));
-      } catch (error) {
-        showMessage({
-          message: 'Error',
-          description: error.message,
-          type: 'danger',
-        });
-      } finally {
+        const result = await uploadImage(createFormData(response.assets[0]));
         if (result?.result) {
           coluorCorrected = result;
         } else {
@@ -192,17 +103,21 @@ const AnalyseScreen = ({navigation}) => {
           });
           return;
         }
+      } catch (error) {
+        console.log(error);
+        showMessage({
+          message: 'Error',
+          description: error.message,
+          type: 'danger',
+        });
+        return;
       }
     }
     await handleDetection(coluorCorrected);
-    setLoading(false);
-    setVisible(true);
-    return;
   };
 
+  // handle detection
   const handleDetection = async (coluorCorrected) => {
-    //setLoading(true);
-    let result;
     let file = response.assets[0].uri;
     setLoadingDialog('Detecting metal...');
 
@@ -214,6 +129,13 @@ const AnalyseScreen = ({navigation}) => {
         await RNFS.writeFile(file, coluorCorrected.image, 'base64');
       } catch (error) {
         console.log(error);
+        showMessage({
+          message: 'Error',
+          description: error.message,
+          type: 'danger',
+        });
+        setLoading(false);
+        return;
       } finally {
         // add prefix to file uri
         file = 'file://' + file;
@@ -228,19 +150,20 @@ const AnalyseScreen = ({navigation}) => {
     };
 
     try {
-      result = await metalDetection(createFormData(tempImage));
+      const result = await metalDetection(createFormData(tempImage));
+      setDetectedMetal(result?.result);
+      setImage(tempImage);
     } catch (error) {
       showMessage({
         message: 'Error',
         description: error.message,
         type: 'danger',
       });
+      setLoading(false);
     } finally {
-      // setLoading(false);
-      console.log(result);
-      setDetectedMetal(result?.result);
-      setImage(tempImage);
-      // setResponse(null);
+      setLoading(false);
+      setLoadingDialog(false);
+      setVisible(true);
     }
   };
 
@@ -340,7 +263,6 @@ const AnalyseScreen = ({navigation}) => {
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
         {/* <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} /> */}
-        {/* <Button icon="database-arrow-down" title="Logout" onPress={() => handleRandomPress()} /> */}
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>
@@ -362,28 +284,15 @@ const AnalyseScreen = ({navigation}) => {
               </View>
             )}
           </View>
-          <Dialog.Content>
-            <Chip
-              icon={isRunningColorCorrection ? 'checkbox-marked-circle-outline' : 'close-circle-outline'}
-              style={styles.chip}
-            >
-              Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}
-            </Chip>
-            <Chip icon={isIgnoreLocation ? 'map-marker-off' : 'map-marker'} style={styles.chip}>
-              {locationText(geoLocation)}
-            </Chip>
-            <Chip icon={'radar'} style={styles.chip}>
-              Result: {detectedMetal}
-            </Chip>
-            {/* <Paragraph>Upload this image for metal detection?</Paragraph>
-            <Paragraph>- Color corrected: {isRunningColorCorrection ? 'Yes' : 'No'}</Paragraph>
-            <Paragraph>{locationText(geoLocation)}</Paragraph>
-            <Text style={styles.dialogText}>Result: {detectedMetal}</Text> */}
-          </Dialog.Content>
+          <View styles={styles.content}>
+            <Chip label={'Color Corrected'} value={isRunningColorCorrection ? 'Yes' : 'No'} icon="palette" />
+            <Chip label={'Location'} value={locationText(geoLocation)} icon="location-on" />
+            <Chip label={'Metal Detected'} value={detectedMetal} icon="compass-calibration" />
+          </View>
           <Dialog.Actions>
             <View style={styles.buttonContainer}>
-              <Button onPress={() => handleHideDialog('Cancel')} title={'Cancel'} />
-              <Button onPress={() => handleHideDialog('Submit Data')} title={'Submit Data'} />
+              <Button onPress={() => setVisible(false)} title={'Cancel'} />
+              <Button onPress={() => handleSubmitData('Submit Data')} title={'Submit Data'} />
             </View>
           </Dialog.Actions>
         </Dialog>
@@ -473,6 +382,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 1,
     marginBottom: 5,
+  },
+  content: {
+    margin: 10,
   },
 });
 
