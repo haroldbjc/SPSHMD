@@ -14,12 +14,9 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.6",
     "@react-native-community/eslint-config": "^3.0.1",
-    "@react-navigation/native": "^6.0.10",
-    "@react-navigation/native-stack": "^6.6.1",
     "@types/react": "^18.0.0",
     "@types/react-native": "^0.67.3",
     "axios": "^0.27.2",
-    "buffer": "^6.0.3",
     "eslint-plugin-import-helpers": "^1.2.1",
     "formik": "^2.2.9",
     "react": "^18.2.0",
@@ -41,12 +38,8 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/runtime": "^7.12.5",
-    "babel-jest": "^26.6.3",
     "eslint": "^7.32.0",
     "jest": "^26.6.3",
-    "metro-react-native-babel-preset": "^0.67.0",
     "prettier": "^2.6.2",
     "react-test-renderer": "17.0.2"
   },

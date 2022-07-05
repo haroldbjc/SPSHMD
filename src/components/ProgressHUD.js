@@ -1,6 +1,5 @@
 import React from 'react';
 import {StatusBar, View, StyleSheet, Modal, Text} from 'react-native';
-import PropTypes from 'prop-types';
 import {ActivityIndicator} from 'react-native-paper';
 
 import theme from '../configs/theme';
@@ -48,28 +47,6 @@ const ProgressHUD = ({
       </View>
     </Modal>
   );
-};
-
-ProgressHUD.propTypes = {
-  isVisible: PropTypes.bool,
-  overlayColor: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  width: PropTypes.number,
-  height: PropTypes.number,
-  borderRadius: PropTypes.number,
-  indicatorSize: PropTypes.string,
-  indicatorColor: PropTypes.string,
-  title: PropTypes.string,
-};
-
-ProgressHUD.defaultProps = {
-  isVisible: false,
-  overlayColor: theme.colors.backdrop,
-  backgroundColor: 'white',
-  width: 80,
-  height: 80,
-  borderRadius: 8,
-  indicatorColor: theme.colors.primary,
 };
 
 const styles = StyleSheet.create({
