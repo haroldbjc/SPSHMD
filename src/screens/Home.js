@@ -1,94 +1,82 @@
-import React from 'react';
-import {KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, useColorScheme, View, StatusBar} from 'react-native';
-import {Formik} from 'formik';
-import ProgressHUD from '../components/ProgressHUD';
-import {showMessage} from 'react-native-flash-message';
-import {addRecord} from '../api';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {TextInput} from 'react-native-paper';
-
-const initialValues = {
-  name: '',
-  position: '',
-  level: '',
-};
+import MapView from 'react-native-maps';
+import {MetalWeight} from '../utils/metalWeight';
+import Button from '../components/Button';
+import {getLocations} from '../api';
+import {getRandomLocations} from '../utils/getRandomLocations';
 
 const HomeScreen = () => {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const isDarkMode = useColorScheme() === 'dark';
+  const [locations, setLocations] = React.useState([]);
+  const [region, setRegion] = React.useState({
+    latitude: 5.3553808,
+    longitude: 100.2912276,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const [randomLocations, setRandomLocations] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const handleSubmission = async (values) => {
-    try {
-      setIsLoading(true);
-      const response = await addRecord(values);
-      console.log(response);
-    } catch (error) {
-      showMessage({
-        message: 'Error',
-        description: "Check your internet connection and try again. Make sure you're connected to the USMSecure.",
-        type: 'danger',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRegionChange = (regionState) => {
+    setRegion(regionState);
   };
 
-  if (isLoading) {
-    return <ProgressHUD isVisible />;
-  }
+  // extract latlng from result array
+  const getLatLng = (result) => {
+    return result.map((item) => {
+      return {
+        latitude: item.location.coords.latitude,
+        longitude: item.location.coords.longitude,
+        description: item.result,
+        weight: MetalWeight(item.result),
+      };
+    });
+  };
+
+  // load data from api
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getLocations();
+      setLocations(getLatLng(result));
+    };
+    fetchData();
+    setRandomLocations(getRandomLocations(region, 0.1, 100));
+    setIsLoading(false);
+  }, []);
+
+  const handlePress = async () => {
+    try {
+      const results = await getLocations(region);
+      setLocations(getLatLng(results));
+    } catch (error) {
+      console.log(error);
+    }
+    console.log(locations);
+  };
 
   return (
-    <Formik
-      initialValues={{initialValues}}
-      onSubmit={(values) => {
-        handleSubmission(values);
-      }}
-    >
-      {({handleChange, handleBlur, handleSubmit, values}) => (
-        <SafeAreaView style={styles.container}>
-          <StatusBar hidden />
-          <KeyboardAvoidingView style={styles.container}>
-            <ScrollView>
-              <TextInput
-                style={styles.textInput}
-                label="Name"
-                value={values.name}
-                onChangeText={handleChange('name')}
-                onBlur={handleBlur('name')}
-                autoCorrect={false}
-              />
-              <TextInput
-                style={styles.textInput}
-                label="Position"
-                value={values.position}
-                onChangeText={handleChange('position')}
-                onBlur={handleBlur('position')}
-                autoCorrect={false}
-              />
-              <TextInput
-                style={styles.textInput}
-                label="Level"
-                value={values.level}
-                onChangeText={handleChange('level')}
-                onBlur={handleBlur('level')}
-                autoCorrect={false}
-              />
-              <View style={styles.buttonContainer}>
-                <Icon.Button
-                  name="send"
-                  backgroundColor={isDarkMode ? Colors.white : Colors.black}
-                  onPress={handleSubmit}
-                  color={isDarkMode ? Colors.black : Colors.white}
-                >
-                  Login
-                </Icon.Button>
-              </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Icon name="map" size={30} color={'black'} />
+        <Text style={styles.headerText}>Heavy Metal Heat Map</Text>
+      </View>
+      {!isLoading && (
+        <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
+          {/* {locations.map((marker, index) => (
+          <Marker key={index} coordinate={marker.latln} title={marker.title} description={marker.description} />
+        ))} */}
+          <MapView.Heatmap
+            points={randomLocations}
+            opacity={1}
+            radius={20}
+            maxIntensity={100}
+            gradientSmoothing={10}
+            heatmapMode={'POINTS_DENSITY'}
+          />
+        </MapView>
       )}
-    </Formik>
+    </SafeAreaView>
   );
 };
 
@@ -111,6 +99,26 @@ const styles = StyleSheet.create({
   },
   sectionDescription: {
     marginTop: 8,
+  },
+  map: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  button: {
+    marginVertical: 6,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  headerText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
+    marginLeft: 10,
   },
 });
 

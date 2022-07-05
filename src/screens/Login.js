@@ -8,7 +8,6 @@ import Button from '../components/Button';
 import {signIn} from '../api/user';
 import {NavigationActions} from 'react-navigation';
 import {showMessage} from 'react-native-flash-message';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Text} from 'react-native-paper';
 
 const LoginScreen = ({navigation}) => {
@@ -43,7 +42,6 @@ const LoginScreen = ({navigation}) => {
       setIsLoading(false);
     }
     if (response) {
-      console.log(await AsyncStorage.getItem('token'));
       navigation.dispatch(
         StackActions.reset({
           index: 0,

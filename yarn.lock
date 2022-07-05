@@ -1920,6 +1920,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/geojson@npm:^7946.0.7":
+  version: 7946.0.8
+  resolution: "@types/geojson@npm:7946.0.8"
+  checksum: 6049a39b025cfe323d5cf87333d87c133ec963cdbd349c49295bee779827ee4b46a3041fd8bd2e7a4b02d6d1e26f3002968875928941bbed08477bfd5f6f9284
+  languageName: node
+  linkType: hard
+
 "@types/graceful-fs@npm:^4.1.2":
   version: 4.1.5
   resolution: "@types/graceful-fs@npm:4.1.5"
@@ -8201,6 +8208,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-maps@npm:^0.31.1":
+  version: 0.31.1
+  resolution: "react-native-maps@npm:0.31.1"
+  dependencies:
+    "@types/geojson": ^7946.0.7
+    deprecated-react-native-prop-types: ^2.3.0
+  peerDependencies:
+    react: ">= 16.0"
+    react-native: ">= 0.51"
+    react-native-web: ">= 0.11"
+  peerDependenciesMeta:
+    react-native-web:
+      optional: true
+  checksum: 0afe7ca5c3b017bcc84503114260abf7db71c28f1fa4c11495ffa01ada33d37a84b60f54ab80ba206bd967caa1003c4245639c877a7cef485c96b98778666f40
+  languageName: node
+  linkType: hard
+
 "react-native-paper@npm:^4.12.0":
   version: 4.12.0
   resolution: "react-native-paper@npm:4.12.0"
@@ -8396,13 +8420,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:17.0.2":
-  version: 17.0.2
-  resolution: "react@npm:17.0.2"
+"react@npm:^18.2.0":
+  version: 18.2.0
+  resolution: "react@npm:18.2.0"
   dependencies:
     loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-  checksum: b254cc17ce3011788330f7bbf383ab653c6848902d7936a87b09d835d091e3f295f7e9dd1597c6daac5dc80f90e778c8230218ba8ad599f74adcc11e33b9d61b
+  checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
   languageName: node
   linkType: hard
 
@@ -9301,7 +9324,7 @@ __metadata:
     jest: ^26.6.3
     metro-react-native-babel-preset: ^0.67.0
     prettier: ^2.6.2
-    react: 17.0.2
+    react: ^18.2.0
     react-native: 0.68.0
     react-native-config: ^1.4.6
     react-native-flash-message: ^0.2.1
@@ -9309,6 +9332,7 @@ __metadata:
     react-native-geolocation-service: ^5.3.0-beta.4
     react-native-gesture-handler: 2.1.1
     react-native-image-picker: ^4.7.3
+    react-native-maps: ^0.31.1
     react-native-paper: ^4.12.0
     react-native-safe-area-context: ^4.2.4
     react-native-screens: ^3.13.1

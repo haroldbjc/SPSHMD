@@ -35,7 +35,7 @@ const LoginScreen = ({navigation}) => {
     } catch (error) {
       showMessage({
         message: 'Error',
-        description: error.response.data?.message,
+        description: error.response.data?.error,
         type: 'danger',
       });
     } finally {

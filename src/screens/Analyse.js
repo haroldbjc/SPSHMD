@@ -5,7 +5,7 @@ import colors from '../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import Checkbox from '../components/Checkbox';
-import {uploadImage, metalDetection} from '../api';
+import {uploadImage, metalDetection, postResults} from '../api';
 import ProgressHUD from '../components/ProgressHUD';
 import {Dialog, Portal, Chip} from 'react-native-paper';
 import {showMessage} from 'react-native-flash-message';
@@ -13,6 +13,8 @@ import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
+import {getRandomLocation} from '../utils/getRandomLocations';
+import {MetalWeight} from '../utils/metalWeight';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
@@ -24,12 +26,91 @@ const AnalyseScreen = ({navigation}) => {
   const [geoLocation, setGeoLocation] = useState();
   const [detectedMetal, setDetectedMetal] = useState(false);
   const [loadingDialog, setLoadingDialog] = useState(false);
+  const [region, setRegion] = React.useState({
+    latitude: 5.3553808,
+    longitude: 100.2912276,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
 
-  const handleHideDialog = (message) => {
+  const handleHideDialog = async (message) => {
     setVisible(false);
     setImage(false);
     if (message === 'Submit Data') {
-      setResponse(null);
+      setLoadingDialog(true);
+      const userdata = await AsyncStorage.getItem('user').then((user) => {
+        return JSON.parse(user);
+      });
+      const data = {
+        userid: userdata.id,
+        username: userdata.username,
+        detectedMetal: detectedMetal,
+        geoLocation: geoLocation,
+      };
+      try {
+        const response2 = await postResults(data);
+        if (response2) {
+          showMessage({
+            message: 'Success',
+            description: 'You have successfully submitted your data.',
+            type: 'success',
+          });
+        } else {
+          console.log('Error');
+        }
+      } catch (error) {
+        showMessage({
+          message: 'Error',
+          description: 'Something went wrong.',
+          type: 'danger',
+        });
+      } finally {
+        if (response) {
+          setLoadingDialog(false);
+          setResponse(null);
+        }
+      }
+    }
+  };
+
+  // send random locations to server
+  const handleRandomPress = async () => {
+    let randomLocations = getRandomLocation(region, 0.1);
+    const userdata = await AsyncStorage.getItem('user').then((user) => {
+      return JSON.parse(user);
+    });
+    const data = {
+      userid: userdata.id,
+      username: userdata.username,
+      detectedMetal: MetalWeight[Math.floor(Math.random() * MetalWeight.length)],
+      geoLocation: {
+        ...geoLocation,
+        coords: {...geoLocation.coords, latitude: randomLocations.latitude, longitude: randomLocations.longitude},
+      },
+    };
+    console.log(data.detectedMetal);
+    try {
+      const response2 = await postResults(data);
+      if (response2) {
+        showMessage({
+          message: 'Success',
+          description: 'You have successfully submitted your data.',
+          type: 'success',
+        });
+      } else {
+        console.log('Error');
+      }
+    } catch (error) {
+      showMessage({
+        message: 'Error',
+        description: 'Something went wrong.',
+        type: 'danger',
+      });
+    } finally {
+      if (response) {
+        setLoadingDialog(false);
+        setResponse(null);
+      }
     }
   };
 
@@ -257,7 +338,8 @@ const AnalyseScreen = ({navigation}) => {
           })}
         </View>
         <Button icon="database-arrow-up" title="Analyse" disabled={!response} onPress={() => handleAnalyze()} />
-        <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} />
+        {/* <Button icon="database-arrow-down" title="Delete token" onPress={() => removeToken()} /> */}
+        {/* <Button icon="database-arrow-down" title="Logout" onPress={() => handleRandomPress()} /> */}
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)} style={styles.dialog}>

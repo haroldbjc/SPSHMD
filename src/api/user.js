@@ -10,6 +10,15 @@ export const signIn = async (user) => {
   const response = await axiosInstance.post('/api/auth/signin', user);
   if (response.data.token) {
     await AsyncStorage.setItem('token', response.data.token);
+    await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+  }
+  return response?.data;
+};
+
+export const editUser = async (user) => {
+  const response = await axiosInstance.post('/api/auth/edituser', user);
+  if (response?.data.user) {
+    await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
   }
   return response?.data;
 };

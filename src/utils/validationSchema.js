@@ -11,3 +11,8 @@ export const validationSchema = Yup.object().shape({
     .oneOf([Yup.ref('password'), null], 'Passwords must match')
     .required('Confirm Password is required'),
 });
+
+export const EditUserValidationSchema = Yup.object().shape({
+  username: Yup.string().required('Username is required').max(20, 'Username must be less than 20 characters'),
+  email: Yup.string().email('Please enter a valid email address').required('Email is required'),
+});

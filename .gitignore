@@ -78,3 +78,4 @@ buck-out/
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+android/app/src/main/assets/index.android.bundle

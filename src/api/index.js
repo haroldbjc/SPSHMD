@@ -28,3 +28,15 @@ export const metalDetection = async (image) => {
   });
   return response.data;
 };
+
+// post results to the server
+export const postResults = async (results) => {
+  const response = await axiosInstance.post('/image/result', results);
+  return response.data;
+};
+
+// get locations from the server
+export const getLocations = async () => {
+  const response = await axiosInstance.get('/image/locations');
+  return response?.data;
+};
