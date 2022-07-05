@@ -34,18 +34,15 @@ const AnalyseScreen = ({navigation}) => {
     if (!geoLocation) {
       requestLocationPermission();
       try {
-        Geolocation.getCurrentPosition(
-          (position) => {
-            setGeoLocation(position);
-          },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-        );
+        Geolocation.getCurrentPosition((position) => {
+          setGeoLocation(position);
+        });
       } catch (error) {
         console.log(error);
         setGeoLocation(null);
       }
     }
-  }, [geoLocation]);
+  }, []);
 
   // submit result to server
   const handleSubmitData = async () => {
@@ -110,6 +107,7 @@ const AnalyseScreen = ({navigation}) => {
           description: error.message,
           type: 'danger',
         });
+        setLoading(false);
         return;
       }
     }
@@ -153,6 +151,7 @@ const AnalyseScreen = ({navigation}) => {
       const result = await metalDetection(createFormData(tempImage));
       setDetectedMetal(result?.result);
       setImage(tempImage);
+      setVisible(true);
     } catch (error) {
       showMessage({
         message: 'Error',
@@ -163,7 +162,6 @@ const AnalyseScreen = ({navigation}) => {
     } finally {
       setLoading(false);
       setLoadingDialog(false);
-      setVisible(true);
     }
   };
 
@@ -272,7 +270,7 @@ const AnalyseScreen = ({navigation}) => {
                 <Image
                   resizeMode="cover"
                   resizeMethod="scale"
-                  source={image.uri ? {uri: image.uri} : {uri: `data:image/png;base64,${image.base64}`}}
+                  source={image.base64 ? {uri: `data:image/png;base64,${image.base64}`} : {uri: image.uri}}
                   // eslint-disable-next-line react-native/no-inline-styles
                   style={{flex: 1, borderRadius: 10}}
                 />
