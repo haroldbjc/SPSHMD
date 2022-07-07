@@ -49,11 +49,13 @@ const AnalyseScreen = ({navigation}) => {
     const userdata = await AsyncStorage.getItem('user').then((user) => {
       return JSON.parse(user);
     });
+    console.log(geoLocation);
     const data = {
       userid: userdata.id,
       username: userdata.username,
       detectedMetal: detectedMetal,
-      geoLocation: geoLocation,
+      latitude: geoLocation?.coords?.latitude,
+      longitude: geoLocation?.coords?.longitude,
     };
     try {
       const result = await postResults(data);
@@ -117,7 +119,6 @@ const AnalyseScreen = ({navigation}) => {
   // handle detection
   const handleDetection = async (coluorCorrected) => {
     let file = response.assets[0].uri;
-    setLoadingDialog('Detecting metal...');
 
     // convert base64 to file then return uri if image.base64 is not null
     if (coluorCorrected?.image) {
@@ -148,6 +149,7 @@ const AnalyseScreen = ({navigation}) => {
     };
 
     try {
+      setLoadingDialog('Detecting metal...');
       const result = await metalDetection(createFormData(tempImage));
       setDetectedMetal(result?.result);
       setImage(tempImage);

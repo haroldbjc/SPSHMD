@@ -1,12 +1,13 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import MapView from 'react-native-maps';
+import {IconButton} from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {MetalWeight} from '../utils/metalWeight';
-import Button from '../components/Button';
-import {getLocations} from '../api';
+import {MetalWeight, metalWeight} from '../utils/metalWeight';
+import {getLocations, postResults} from '../api';
 import {getRandomLocations} from '../utils/getRandomLocations';
+import theme from '../configs/theme';
 
 const HomeScreen = () => {
   const [locations, setLocations] = React.useState([]);
@@ -19,6 +20,39 @@ const HomeScreen = () => {
   const [randomLocations, setRandomLocations] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
+  // // batch post locations to server
+  // const postLocations = async () => {
+  //   setRandomLocations(getRandomLocations(region, 0.1, 100));
+  //   const userdata = await AsyncStorage.getItem('user').then((user) => {
+  //     return JSON.parse(user);
+  //   });
+  //   let userid = userdata.id;
+  //   let username = userdata.username;
+  //   for (let i = 0; i < randomLocations.length; i++) {
+  //     let data = {
+  //       userid: userid,
+  //       username: username,
+  //       detectedMetal: metalWeight[Math.floor(Math.random() * metalWeight.length)],
+  //       latitude: randomLocations[i].latitude,
+  //       longitude: randomLocations[i].longitude,
+  //     };
+  //     try {
+  //       setIsLoading(true);
+  //       await postResults(data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  //   // load data from api
+  //   const fetchData = async () => {
+  //     const result = await getLocations();
+  //     setLocations(getLatLng(result));
+  //   };
+  //   fetchData();
+  // };
+
   const handleRegionChange = (regionState) => {
     setRegion(regionState);
   };
@@ -27,9 +61,9 @@ const HomeScreen = () => {
   const getLatLng = (result) => {
     return result.map((item) => {
       return {
-        latitude: item.location.coords.latitude,
-        longitude: item.location.coords.longitude,
-        description: item.result,
+        latitude: item?.latitude,
+        longitude: item?.longitude,
+        description: item?.result,
         weight: MetalWeight(item.result),
       };
     });
@@ -42,33 +76,18 @@ const HomeScreen = () => {
       setLocations(getLatLng(result));
     };
     fetchData();
-    setRandomLocations(getRandomLocations(region, 0.1, 100));
     setIsLoading(false);
   }, []);
 
-  const handlePress = async () => {
-    try {
-      const results = await getLocations(region);
-      setLocations(getLatLng(results));
-    } catch (error) {
-      console.log(error);
-    }
-    console.log(locations);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="map" size={30} color={'black'} />
-        <Text style={styles.headerText}>Heavy Metal Heat Map</Text>
-      </View>
       {!isLoading && (
         <MapView style={styles.map} region={region} onRegionChangeComplete={handleRegionChange}>
           {/* {locations.map((marker, index) => (
           <Marker key={index} coordinate={marker.latln} title={marker.title} description={marker.description} />
         ))} */}
           <MapView.Heatmap
-            points={randomLocations}
+            points={locations}
             opacity={1}
             radius={20}
             maxIntensity={100}
@@ -77,6 +96,16 @@ const HomeScreen = () => {
           />
         </MapView>
       )}
+      <View style={styles.buttonContainer}>
+        <IconButton icon="view-dashboard-edit" size={35} style={styles.icon} color={theme.colors.accent} />
+        {/* <IconButton
+          icon="z-wave"
+          size={35}
+          style={styles.icon}
+          color={theme.colors.accent}
+          onPress={() => postLocations()}
+        /> */}
+      </View>
     </SafeAreaView>
   );
 };
@@ -102,9 +131,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   map: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    ...StyleSheet.absoluteFillObject,
   },
   button: {
     marginVertical: 6,
@@ -120,6 +147,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginLeft: 10,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  },
+  icon: {
+    backgroundColor: theme.colors.background,
   },
 });
 
