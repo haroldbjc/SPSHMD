@@ -9,7 +9,7 @@ export const standardHeaderStyle = {
   borderBottomWidth: 0,
   ...Platform.select({
     android: {
-      height: StatusBar.currentHeight + 20,
+      height: StatusBar.currentHeight + 40,
     },
     ios: {
       height: 66,

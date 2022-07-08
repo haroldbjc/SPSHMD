@@ -12,6 +12,7 @@ const theme = {
     background: '#fff',
     danger: colors.DANGER,
     lightGray: colors.LIGHT_GRAY,
+    text: colors.TEXT,
   },
 };
 

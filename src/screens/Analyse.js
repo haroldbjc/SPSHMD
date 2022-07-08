@@ -16,6 +16,7 @@ import Button from '../components/Button';
 import {requestLocationPermission} from '../utils/locationAccess';
 import createFormData from '../utils/createFormData';
 import Chip from '../components/Chip';
+import HeaderChip from '../components/HeaderChip';
 const includeExtra = true;
 
 const AnalyseScreen = ({navigation}) => {
@@ -42,6 +43,7 @@ const AnalyseScreen = ({navigation}) => {
         setGeoLocation(null);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // submit result to server
@@ -189,14 +191,6 @@ const AnalyseScreen = ({navigation}) => {
     [analyzerOptions],
   );
 
-  const removeToken = async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const isRunningColorCorrection =
     analyzerOptions.find((option) => option.value === 'runColorCorrection').checked === 'checked';
 
@@ -219,6 +213,11 @@ const AnalyseScreen = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <StatusBar hidden />
       <ScrollView>
+        <HeaderChip
+          mainText={'Metal Detector'}
+          icon="compass-calibration"
+          altText={'Take/Select an Image, Analyse then Submit Data'}
+        />
         <View style={styles.imageContainer}>
           {response?.assets &&
             response?.assets.map(({uri}) => (
@@ -243,7 +242,15 @@ const AnalyseScreen = ({navigation}) => {
         </View>
         <View style={styles.buttonContainer}>
           {actions.map(({title, type, options, icon}) => {
-            return <Button key={title} icon={icon} title={title} onPress={() => onButtonPress(type, options)} />;
+            return (
+              <Button
+                key={title}
+                icon={icon}
+                title={title}
+                onPress={() => onButtonPress(type, options)}
+                style={styles.button}
+              />
+            );
           })}
         </View>
         <View style={styles.analyserContainer}>
@@ -291,8 +298,12 @@ const AnalyseScreen = ({navigation}) => {
           </View>
           <Dialog.Actions>
             <View style={styles.buttonContainer}>
-              <Button onPress={() => setVisible(false)} title={'Cancel'} />
-              <Button onPress={() => handleSubmitData('Submit Data')} title={'Submit Data'} />
+              <Button onPress={() => setVisible(false)} title={'Cancel'} style={styles.dialogButton} />
+              <Button
+                onPress={() => handleSubmitData('Submit Data')}
+                title={'Submit Data'}
+                style={styles.dialogButton}
+              />
             </View>
           </Dialog.Actions>
         </Dialog>
@@ -305,12 +316,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.WHITE,
-    padding: 10,
+    padding: 20,
   },
   imageContainer: {
-    height: 400,
+    height: 350,
     borderRadius: 10,
-    margin: 10,
+    marginBottom: 10,
     backgroundColor: colors.WHITE,
     justifyContent: 'center',
     alignItems: 'center',
@@ -319,13 +330,14 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    // gap between buttons is 10
+    justifyContent: 'space-between',
   },
   noImage: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 400,
+    height: 350,
     borderRadius: 10,
     margin: 10,
     backgroundColor: colors.WHITE,
@@ -362,7 +374,7 @@ const styles = StyleSheet.create({
   analyserContainer: {
     flex: 1,
     borderRadius: 10,
-    margin: 10,
+    marginVertical: 10,
     backgroundColor: colors.CONTAINER,
     padding: 10,
   },
@@ -373,6 +385,7 @@ const styles = StyleSheet.create({
   dialog: {
     backgroundColor: colors.GRAY,
     borderRadius: 10,
+    padding: 10,
   },
   chip: {
     margin: 1,
@@ -385,6 +398,10 @@ const styles = StyleSheet.create({
   },
   content: {
     margin: 10,
+  },
+  dialogButton: {
+    marginLeft: 10,
+    marginRight: 0,
   },
 });
 

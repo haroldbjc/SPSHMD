@@ -1,5 +1,6 @@
-import {axiosInstance} from './utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {axiosInstance} from './utils';
 
 export const signUp = async (user) => {
   const response = await axiosInstance.post('/api/auth/signup', user);
@@ -20,6 +21,12 @@ export const editUser = async (user) => {
   if (response?.data.user) {
     await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
   }
+  return response?.data;
+};
+
+// change password
+export const changePassword = async (user) => {
+  const response = await axiosInstance.post('/api/auth/editpassword', user);
   return response?.data;
 };
 

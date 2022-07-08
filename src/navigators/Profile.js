@@ -3,6 +3,8 @@ import {createStackNavigator, CardStyleInterpolators} from 'react-navigation-sta
 import {standardHeaderTitleStyle, standardHeaderStyle, standardCardStyle} from '../configs/styles';
 import urls from '../constants/urls';
 import ProfileScreen from '../screens/Profile';
+import EditProfile from '../screens/EditProfile';
+import ChangePassword from '../screens/ChangePassword';
 
 export default createStackNavigator(
   {
@@ -10,6 +12,18 @@ export default createStackNavigator(
       screen: ProfileScreen,
       navigationOptions: () => ({
         headerShown: false,
+      }),
+    },
+    [urls.PROFILE_EDIT]: {
+      screen: EditProfile,
+      navigationOptions: () => ({
+        title: 'Edit Profile',
+      }),
+    },
+    [urls.PROFILE_CHANGE_PASSWORD]: {
+      screen: ChangePassword,
+      navigationOptions: () => ({
+        title: 'Change Password',
       }),
     },
   },

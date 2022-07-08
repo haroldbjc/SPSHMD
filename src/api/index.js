@@ -40,3 +40,9 @@ export const getLocations = async () => {
   const response = await axiosInstance.get('/image/locations');
   return response?.data;
 };
+
+// delete location from the server
+export const deleteLocation = async (id) => {
+  const response = await axiosInstance.delete(`/image/location/${id}`);
+  return response.data;
+};

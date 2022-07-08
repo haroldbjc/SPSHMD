@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#6B7FD7',
     marginBottom: 10,
-    marginHorizontal: 10,
   },
   label: {
     fontSize: 14,

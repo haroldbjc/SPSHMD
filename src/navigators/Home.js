@@ -1,8 +1,8 @@
 import {createStackNavigator, CardStyleInterpolators} from 'react-navigation-stack';
 
-import CameraScreen from '../screens/Camera';
 import {standardHeaderTitleStyle, standardHeaderStyle, standardCardStyle} from '../configs/styles';
 import urls from '../constants/urls';
+import HistoryScreen from '../screens/History';
 import HomeScreen from '../screens/Home';
 
 export default createStackNavigator(
@@ -11,14 +11,12 @@ export default createStackNavigator(
       screen: HomeScreen,
       navigationOptions: () => ({
         headerShown: false,
-        // title: 'SPSHMD',
-        // headerLeft: () => <LogoHeader />,
       }),
     },
-    [urls.HOME_CAMERA]: {
-      screen: CameraScreen,
+    [urls.HOME_HISTORY]: {
+      screen: HistoryScreen,
       navigationOptions: () => ({
-        title: 'Analyse',
+        title: 'History',
       }),
     },
   },

@@ -5,12 +5,12 @@ import {Button as PaperButton} from 'react-native-paper';
 import {buttonTheme} from '../configs/theme';
 import colors from '../constants/colors';
 
-const Button = ({title, mode = 'contained', ...props}) => {
+const Button = ({title, style, labelStyle, mode = 'contained', ...props}) => {
   return (
     <PaperButton
       mode={mode}
-      labelStyle={styles.labelStyle}
-      style={styles.viewStyle}
+      labelStyle={[styles.labelStyle, labelStyle]}
+      style={[styles.viewStyle, style]}
       theme={buttonTheme}
       contentStyle={styles.contentStyle}
       {...props}
@@ -27,14 +27,9 @@ const styles = StyleSheet.create({
     height: 45,
   },
   viewStyle: {
-    minWidth: '45%',
     maxWidth: '100%',
-    marginHorizontal: 8,
     marginVertical: 4,
     borderRadius: 8,
-    elevation: 0,
-    // borderColor: colors.ACCENT,
-    // borderWidth: 1,
   },
   labelStyle: {
     color: colors.ACCENT,

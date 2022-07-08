@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import theme from '../configs/theme';
 import AnalyseScreen from '../screens/Analyse';
+import colors from '../constants/colors';
 
 import HomeNavigator from './Home';
 import ProfileNavigator from './Profile';
@@ -13,8 +14,8 @@ export default createMaterialBottomTabNavigator(
     Home: {
       screen: HomeNavigator,
       navigationOptions: () => ({
-        tabBarLabel: 'Home',
-        tabBarIcon: ({tintColor}) => <Icon name="home" color={tintColor} size={24} />,
+        tabBarLabel: 'Dashboard',
+        tabBarIcon: ({tintColor}) => <Icon name="map" color={tintColor} size={24} />,
       }),
     },
     Analyse: {
@@ -34,9 +35,10 @@ export default createMaterialBottomTabNavigator(
   },
   {
     initialRouteName: 'Analyse',
-    activeColor: theme.colors.primary,
+    activeColor: colors.ACCENT,
     inactiveColor: theme.colors.inactive,
     barStyle: {backgroundColor: '#fff'},
-    shifting: true,
+    shifting: false,
+    resetOnBlur: true,
   },
 );

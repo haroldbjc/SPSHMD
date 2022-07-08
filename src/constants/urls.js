@@ -11,10 +11,12 @@ export default {
   MAIN_ANALYSE: 'MainAnalyse',
 
   HOME_MAIN: 'HomeMain',
-  HOME_CAMERA: 'HomeCamera',
+  HOME_HISTORY: 'HomeHistory',
 
   ANALYSE_MAIN: 'AnalyseMain',
   ANALYSE_SUMMARY: 'AnalyseSummary',
 
   PROFILE_MAIN: 'ProfileMain',
+  PROFILE_EDIT: 'ProfileEdit',
+  PROFILE_CHANGE_PASSWORD: 'ProfileChangePassword',
 };

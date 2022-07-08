@@ -8,10 +8,12 @@ import {showMessage} from 'react-native-flash-message';
 import Button from '../components/Button';
 import {signIn} from '../api/user';
 import TextInput from '../components/TextInput';
+import PasswordInput from '../components/PasswordInput';
 import Text from '../components/Text';
 
 const LoginScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const initialValues = {
     username: '',
@@ -74,16 +76,18 @@ const LoginScreen = ({navigation}) => {
                 onBlur={handleBlur('username')}
                 autoCorrect={false}
               />
-              <TextInput
+              <PasswordInput
                 label="Password"
                 value={values.password}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 autoCorrect={false}
-                secureTextEntry={true}
+                secureTextEntry={!showPassword}
+                showPassword={showPassword}
+                onPress={() => setShowPassword(!showPassword)}
               />
-              <Button title={'Login'} onPress={handleSubmit} loading={isLoading} icon="login" />
-              <Button title={'Register'} onPress={handleRegister} icon="account-plus" />
+              <Button title={'Login'} onPress={handleSubmit} loading={isLoading} icon="login" style={styles.button} />
+              <Button title={'Register'} onPress={handleRegister} icon="account-plus" style={styles.button} />
             </View>
           )}
         </Formik>
@@ -125,6 +129,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 20,
+  },
+  button: {
+    width: '100%',
   },
 });
 
