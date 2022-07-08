@@ -4,19 +4,12 @@ import urls from '../constants/urls';
 import {standardCardStyle, standardHeaderStyle, standardHeaderTitleStyle} from '../configs/styles';
 
 import BottomNavigator from './BottomNav';
-import AnalyseNavigator from './Analyse';
 import AuthNavigator from './Auth';
 
 export default createStackNavigator(
   {
     [urls.MAIN_HOME]: {
       screen: BottomNavigator,
-      navigationOptions: () => ({
-        headerShown: false,
-      }),
-    },
-    [urls.MAIN_ANALYSE]: {
-      screen: AnalyseNavigator,
       navigationOptions: () => ({
         headerShown: false,
       }),
