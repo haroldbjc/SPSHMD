@@ -1,12 +1,10 @@
 import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, View, Dimensions} from 'react-native';
 import MapView from 'react-native-maps';
-import {IconButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {MetalWeight, metalWeight} from '../utils/metalWeight';
-import {getLocations, postResults} from '../api';
-import {getRandomLocations} from '../utils/getRandomLocations';
+import {MetalWeight} from '../utils/metalWeight';
+import {getLocations} from '../api';
 import theme from '../configs/theme';
 import HeaderChip from '../components/HeaderChip';
 import Button from '../components/Button';
@@ -19,63 +17,33 @@ const HomeScreen = ({navigation}) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const [randomLocations, setRandomLocations] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [authUser, setAuthUser] = React.useState(null);
   const [buttonLoading, setButtonLoading] = React.useState(false);
   const [onMapReady, setOnMapReady] = React.useState(false);
 
-  // batch post locations to server
-  const postLocations = async () => {
-    setRandomLocations(getRandomLocations(region, 0.1, 100));
-    const userdata = await AsyncStorage.getItem('user').then((user) => {
-      return JSON.parse(user);
-    });
-    let userid = userdata.id;
-    let username = userdata.username;
-    for (let i = 0; i < randomLocations.length; i++) {
-      let data = {
-        userid: userid,
-        username: username,
-        detectedMetal: metalWeight[Math.floor(Math.random() * metalWeight.length)],
-        latitude: randomLocations[i].latitude,
-        longitude: randomLocations[i].longitude,
-      };
-      try {
-        setIsLoading(true);
-        await postResults(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    // load data from api
-    const fetchData = async () => {
-      const result = await getLocations();
-      setLocations(getLatLng(result));
-    };
-    fetchData();
-  };
-
   const handleRegionChange = (regionState) => {
     setRegion(regionState);
   };
 
-  // extract latlng from result array
+  // extract latlng from result array filter out null latlng
   const getLatLng = (result) => {
-    return result.map((item) => {
-      return {
-        id: item?._id,
-        latitude: item?.latitude,
-        longitude: item?.longitude,
-        description: item?.result,
-        weight: MetalWeight(item.result),
-        username: item?.username,
-        detectedMetal: item?.detectedMetal,
-        date: item?.time,
-      };
-    });
+    let latlng = [];
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].latitude !== null && result[i].longitude !== null) {
+        latlng.push({
+          id: result[i].id,
+          username: result[i].username,
+          description: result[i].result,
+          latitude: result[i].latitude,
+          longitude: result[i].longitude,
+          weight: MetalWeight(result[i].result),
+          date: result[i].time,
+          detectedMetal: result[i].detectedMetal,
+        });
+      }
+    }
+    return latlng;
   };
 
   // load data from api
@@ -112,7 +80,7 @@ const HomeScreen = ({navigation}) => {
   // when map is ready
   const handleMapReady = () => {
     setOnMapReady(true);
-  }
+  };
 
   if (isLoading) {
     return <></>;
@@ -141,13 +109,6 @@ const HomeScreen = ({navigation}) => {
       )}
       <HeaderChip icon="map" mainText={'HeatMap'} altText={'Monitor the magnitudes of meavy metals'} />
       <View style={styles.buttonContainer}>
-        {/* <IconButton
-          icon="z-wave"
-          size={35}
-          style={styles.icon}
-          color={theme.colors.accent}
-          onPress={() => postLocations()}
-        /> */}
         <Button
           loading={buttonLoading}
           icon="history"
