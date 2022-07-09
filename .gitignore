@@ -29,7 +29,6 @@ build/
 local.properties
 *.iml
 *.hprof
-android/src/main/AndroidManifest.xml
 
 # node.js
 #
@@ -80,3 +79,4 @@ buck-out/
 !.yarn/versions
 .pnp.*
 android/app/src/main/assets/index.android.bundle
+android/app/src/main/AndroidManifest.xml
