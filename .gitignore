@@ -29,7 +29,7 @@ build/
 local.properties
 *.iml
 *.hprof
-!AndroidManifest.xml
+android/src/main/AndroidManifest.xml
 
 # node.js
 #
