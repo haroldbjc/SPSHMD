@@ -24,7 +24,6 @@ export const editUser = async (user) => {
   return response?.data;
 };
 
-// change password
 export const changePassword = async (user) => {
   const response = await axiosInstance.post('/api/auth/editpassword', user);
   return response?.data;
@@ -42,6 +41,7 @@ export const getCurrentUser = () => {
   return token;
 };
 
+// testing API calls
 export const testApi = async () => {
   const response = await axiosInstance.get('/api');
   return response.data;

@@ -11,6 +11,7 @@ export const addRecord = async (record) => {
   return response.data;
 };
 
+// upload image for color correction
 export const uploadImage = async (image) => {
   const response = await axiosInstance.post('/image/upload', image, {
     headers: {
@@ -20,6 +21,7 @@ export const uploadImage = async (image) => {
   return response.data;
 };
 
+// upload image for metal detection
 export const metalDetection = async (image) => {
   const response = await axiosInstance.post('/image/metalDetection', image, {
     headers: {
